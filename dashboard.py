@@ -84,7 +84,7 @@ def load_data():
             data = raw
         elif isinstance(raw, dict):
             # Cherche la clÃ© qui contient la liste d'assets
-            for key in ["assets", "results", "data", "scores", "universe"]:
+            for key in ["top_recommendations", "assets", "results", "data", "scores", "universe"]:
                 if key in raw and isinstance(raw[key], list):
                     data = raw[key]
                     break
@@ -97,6 +97,10 @@ def load_data():
 
         # Normalise les noms de colonnes en minuscules
         df.columns = [c.lower().strip() for c in df.columns]
+
+        # Alias de colonnes : harmonise les noms entre engine et dashboard
+        col_aliases = {"symbol": "ticker", "action": "recommendation", "asset_class": "asset_type"}
+        df.rename(columns={k: v for k, v in col_aliases.items() if k in df.columns}, inplace=True)
 
         # Cast numÃ©rique pour les scores
         for col in SCORE_COLS:
@@ -400,7 +404,7 @@ elif page == "ð DÃ©tail Asset":
                 try:
                     v = float(val)
                     delta_color = "normal" if v >= 50 else "inverse"
-                    cols[i % 4].metric(label, f"{v:.1f}", delta=f"{'â' if v >= 50 else 'â'}", delta_color=delta_color)
+                    cols[i % 4].metric(label, f"{v:.1f}", delta=f"{'ehjH}" if v >= 50 else 'â'}", delta_color=delta_color)
                 except:
                     cols[i % 4].metric(label, str(val))
 
@@ -440,7 +444,7 @@ elif page == "ð DÃ©tail Asset":
 
 # âââââââââââââââââââââââââââââââââââââââââââââââ
 # PAGE 4 â ALERTES / SIGNAUX
-# âââââââââââââââââââââââââââââââââââââââââââââââ
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 elif page == "ð¨ Alertes / Signaux":
 
     rec_col = "recommendation" if "recommendation" in available_cols else None
@@ -492,10 +496,11 @@ elif page == "ð¨ Alertes / Signaux":
     if "final_score" in available_cols and ticker_col:
         col_t, col_b = st.columns(2)
         with col_t:
-            st.subheader("ð Top 5 scores")
+            st.subheader("ð Top 5 scores")
             top5 = df[[ticker_col, "final_score", rec_col]].sort_values("final_score", ascending=False).head(5)
             st.dataframe(top5.style.applymap(color_rec, subset=[rec_col]).applymap(score_color, subset=["final_score"]), use_container_width=True)
         with col_b:
-            st.subheader("{â ï¸ Bottom 5 scores")
+            st.subheader("â ï¸ Bottom 5 scores")
             bot5 = df[[ticker_col, "final_score", rec_col]].sort_values("final_score").head(5)
             st.dataframe(bot5.style.applymap(color_rec, subset=[rec_col]).applymap(score_color, subset=["final_score"]), use_container_width=True)
+

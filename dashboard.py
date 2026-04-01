@@ -404,7 +404,7 @@ elif page == "ð DÃ©tail Asset":
                 try:
                     v = float(val)
                     delta_color = "normal" if v >= 50 else "inverse"
-                    cols[i % 4].metric(label, f"{v:.1f}", delta=f"{'ehjH}" if v >= 50 else 'â'}", delta_color=delta_color)
+                    cols[i % 4].metric(label, f"{v:.1f}", delta=f"{'\u2191' if v >= 50 else '\u2193'}", delta_color=delta_color)
                 except:
                     cols[i % 4].metric(label, str(val))
 
